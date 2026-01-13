@@ -1,0 +1,68 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    // 1. 코틀린 플러그인 추가
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.6.21'
+}
+
+repositories {
+    mavenCentral()
+}
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+subprojects {
+    group = 'me.study'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '17'
+
+    // 2. 하위 모듈에도 코틀린 플러그인 적용
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "java"
+    apply plugin: "org.jetbrains.kotlin.jvm"
+    apply plugin: "org.jetbrains.kotlin.plugin.spring"
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+
+        // 3. 코틀린 라이브러리 의존성 추가
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation "org.jetbrains.kotlin:kotlin-reflect"
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
+            because("Only needed to run tests in a version of IntelliJ IDEA that bundles older versions")
+        }
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    }
+
+    // 4. 코틀린 컴파일 대상 JVM 버전 설정 (Java 11과 일치)
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+            freeCompilerArgs = ["-Xjsr305=strict"]
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}
