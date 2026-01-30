@@ -52,10 +52,21 @@ public class Example6_08 {
         String visitorName = "Jinseong2";
         LocalDateTime timeOfVisit = LocalDateTime.now();
 
-        final File dir = new File("/Users/jinseonghwang/IdeaProjects/unit-test-book-junit5/chapter06/data");
+        // 수정된 디렉토리 경로 (프로젝트 내에 테스트용 디렉토리)
+        final File dir = new File("src/test/resources/data");
+
+        // 디렉토리 없으면 생성
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                System.out.println("디렉토리가 성공적으로 생성되었습니다.");
+            } else {
+                throw new IllegalStateException("디렉토리 생성에 실패했습니다.");
+            }
+        }
+
         final List<String> filePaths = Arrays.stream(Objects.requireNonNull(dir.listFiles()))
-                                             .map(File::getPath)
-                                             .collect(Collectors.toList());
+                .map(File::getPath)
+                .collect(Collectors.toList());
         final List<Entry<Integer, String>> sorted = sortByIndex(filePaths);
 
         final String newRecord = String.format("%s;%s", visitorName, timeOfVisit.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
@@ -67,8 +78,7 @@ public class Example6_08 {
                     fileWriter.write(newRecord);
                 }
                 return;
-            }
-            else {
+            } else {
                 throw new IllegalStateException("\"audit_1.txt\" named file already exists.");
             }
         }
@@ -84,8 +94,7 @@ public class Example6_08 {
                 lines.add(newRecord);
                 fileWriter.write(String.join("\r\n", lines));
             }
-        }
-        else {
+        } else {
             final int newIndex = currentFileIndex + 1;
             final String newName = String.format("audit_%d.txt", newIndex);
             final File newFile = new File(dir.getPath() + "/" + newName);
@@ -100,7 +109,7 @@ public class Example6_08 {
     private List<Entry<Integer, String>> sortByIndex(List<String> files) {
         final Map<Integer, String> map = new HashMap<>();
         IntStream.range(0, files.size())
-                 .forEach(i -> map.put(getIndex(files.get(i)), files.get(i)));
+                .forEach(i -> map.put(getIndex(files.get(i)), files.get(i)));
 
         final List<Entry<Integer, String>> entries = new ArrayList<>(map.entrySet());
         entries.sort(Entry.comparingByKey());

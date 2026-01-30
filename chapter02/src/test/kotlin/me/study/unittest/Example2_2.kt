@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 class Example2_2_kt {
 
     @Mock
-    lateinit var storeMock: Store // 코틀린에서 Mock은 lateinit var로 선언합니다.
+    lateinit var storeMock: Store
 
     @Test
     fun `Purchase succeeds when enough inventory`() {
